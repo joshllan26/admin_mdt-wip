@@ -1,0 +1,206 @@
+<html>
+    <head>
+        <!-- Requirements -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+        <!-- Custom Styling -->
+        <style>
+            html{background-color:transparent !important;}
+            #container {
+                width: 1000px;
+                height: 800px;
+                margin-top: 100px;
+                margin: auto;
+                background-color: rgb(60,60,60);
+                display: none;
+            }
+            #topbar {
+                width: 100%;
+                height: 30px;
+                background-color: rgb(40,40,40);
+                border-bottom: solid 3px black;
+            }
+            #topbar h3 {
+                color: white;
+                float: left;
+                margin-top: 3px;
+                font-size: 20px;
+                margin-left: 10px;
+            }
+            #close {
+                float: right;
+                font-size: 20px;
+                border-left: solid 1px rgb(20,20,20);
+                padding-left: 3px;
+                padding-right: 2px;
+            }
+            #navigation {
+                float: left;
+                margin-left: -120px;
+            }
+            #navigation button {
+                width: 150px;
+                background-color: rgb(40,40,40);
+                border: solid 2px rgb(40,40,40);
+                border-bottom-left-radius: 10px;
+                border-bottom-right-radius: 10px;
+                color: white;
+                margin-right: -3px;
+            }
+            #main {
+                background-color: rgb(50,50,50);
+                width: 96%;
+                margin: auto;
+                margin-top: 40px;
+                height: 710px;
+                box-shadow: inset 1px -1px rgba(0,0,0,0.25);
+                overflow-y: scroll;
+            }
+            .page {
+                color: white;
+                overflow-y: scroll;
+                padding: 1%;
+            }
+            .page h3 {
+                color: white;
+                font-size: 20px;
+                padding-left: 10px;
+                padding-top: 2px;
+            }
+            ::-webkit-scrollbar {
+                width: 5px;
+            }
+            ::-webkit-scrollbar-track {
+                border: none;
+            }
+            ::-webkit-scrollbar-thumb {
+                background: rgb(20,20,20);
+                border-radius:2px;
+            }
+            #notes {
+                width: 100%;
+                background-color: rgb(40,40,40);
+                color: white;
+                border: solid 1px rgb(20,20,20);
+                border-radius: 5px;
+            }
+            #r {
+                color: white;
+                width: 100%
+            }
+            #r li {
+                border-bottom: solid 2px rgb(100, 100, 100);
+                width: 100%;
+            }
+            #r li h4 {
+                font-size: 16px;
+            }
+            #r li p {
+                font-size: 14px;
+                font-style: italic;
+            }
+            #r li button {
+                color: white;
+                width: 50px;
+                height: 20px;
+                font-size: 14px;
+                background-color:rgb(20,20,20);
+                border: solid 2px white;
+                border-radius: 3px;
+            }
+            #p {
+                color: white;
+                width: 100%
+            }
+            #p li {
+                border-bottom: solid 2px rgb(100,100,100);
+                width: 100%
+            }
+        </style>
+
+        <!-- Custom Script Code -->
+        <script>
+            window.addEventListener('message', function(event){
+                if(event.data.type == "open"){
+                    $('#container').css('display', 'block');
+                    $('#r').empty();
+                    $('#p').empty();
+                }
+                if(event.data.type == "update"){
+                    if(event.data.item == "notepad"){
+                        $('#notes').val(event.data.content);
+                    }
+                    if(event.data.item == "player"){
+                        AddPlayer(event);
+                    }
+                    if(event.data.item == "report"){
+                        AddReport(event);
+                    }
+                }
+            })
+
+            function AddReport(details){
+                id = details.data.report_id;
+                report = details.data.report_content;
+                user = details.data.reporting_user;
+
+                if(report != null){
+                    $("#r").append('<li id="' + id + '"><h4>' + report + '</h4><p>Reported by ' + user +'</p><button t="' + id + '" style="float:left;">10-97</button><button t="' + id + '" style="float:left;">10-22</button><button t="' + id + '" style="float:left;">10-32</button></li>')
+                }
+            }
+            function AddPlayer(details){
+                pid = details.data.player_id;
+                pname = details.data.player_name;
+                rank = details.data.player_rank;
+
+                if(pid != null && pid != 0 && pname != null && pname != ''){
+                    $("#p").append('<li class="player_card" id="' + pid +'"><p>' + pname + ' | ' + pid + '</p></li>')
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div id="container">
+            <div id="topbar">
+                <h3>ADMIN MDT</h3>
+                <div id="close">&#10060;</div>
+            </div>
+            <div id="navigation">
+                <button t="reports">Reports</button>
+                <button t="players">Players</button>
+                <button t="notepad">Notepad</button>
+            </div>
+            <script>
+                $('#navigation').on('click', 'button', function(){
+                    $(".page").hide;
+                    $("#reports").hide();
+                    $("#players").hide();
+                    $("#notepad").hide();
+                    $("#" + $(this).attr("t")).show();
+                })
+            </script>
+            <div id="main">
+                <div class="page" id="reports" style="display:block;">
+                    <h3>Reports</h3>
+                    <ul id="r"></ul>
+                </div>
+                <div class="page" id="players" style="display:none;">
+                    <h3>Players</h3>
+                    <ul id="p"></ul>
+                </div>
+                <div class="page" id="notepad" style="display:none;">
+                    <h3>Notepad</h3>
+                    <textarea id="notes" style="height:calc(92%);"></textarea>
+                    <script>
+                        $("#notes").change(function(){
+                            $.post("http://admin_mdt/notepad", JSON.stringify(String($("#notes").val())));
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
